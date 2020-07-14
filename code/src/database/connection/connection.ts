@@ -10,4 +10,4 @@ const connection = knex({
         }
 });
 
-module.exports = connection;
+export default connection;
