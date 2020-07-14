@@ -6,7 +6,12 @@ module.exports = {
     connection: {
       database: 'tauria',
       user: 'postgres',
-      password: 'toor'
+      password: 'toor',
+    },
+    searchPath: ['knex', 'private'],
+    migrations: {
+      schemaName: 'private',
+      directory: `${__dirname}/src/database/migration`,
     }
   }
 };
