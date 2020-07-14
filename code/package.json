@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "jest",
+    "test": "jest --detectOpenHandles",
     "dev": "ts-node src/app/app.ts",
     "knex:latest": "knex migrate:latest --knexfile knexfile.ts",
     "knex:seed": "knex seed:run --knexfile knexfile.ts"
@@ -17,7 +17,11 @@
     "@types/jest": "^26.0.4",
     "@types/knex": "^0.16.1",
     "@types/pg": "^7.14.4",
+    "@types/sqlite3": "^3.1.6",
+    "@types/supertest": "^2.0.10",
     "jest": "^26.1.0",
+    "sqlite3": "^5.0.0",
+    "supertest": "^4.0.2",
     "ts-jest": "^26.1.2",
     "ts-node": "^8.10.2",
     "typescript": "^3.9.6"
