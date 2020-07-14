@@ -2,7 +2,6 @@
 
 module.exports = {
   development: {
-    
     client: 'pg',
 
     connection: {
@@ -22,5 +21,23 @@ module.exports = {
       directory: `${__dirname}/src/database/seed`,
     }
 
+  },
+
+  test: {
+    client: 'sqlite3',
+
+    connection: {
+      filename: `${__dirname}/db_test/db_test.sqlite`
+    },
+
+    useNullAsDefault: true,
+
+    migrations: {
+      directory: `${__dirname}/db_test/migration`,
+    },
+
+    seeds: {
+      directory: `${__dirname}/db_test/seed`,
+    }
   }
 };
