@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "ts-node src/app/app.ts",
-    "knex:latest": "knex migrate:latest --knexfile knexfile.ts"
+    "knex:latest": "knex migrate:latest --knexfile knexfile.ts",
+    "knex:seed": "knex seed:run --knexfile knexfile.ts"
   },
   "keywords": [],
   "author": "",
