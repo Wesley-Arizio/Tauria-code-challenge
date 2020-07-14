@@ -7,12 +7,16 @@ export async function up(knex: Knex): Promise<void> {
         table.integer('user')
             .notNullable()
             .references('id')
-            .inTable('user');
+            .inTable('user')
+            .onUpdate('CASCADE')
+            .onDelete('CASCADE');
 
         table.integer('room')
             .notNullable()
             .references('id')
-            .inTable('room');
+            .inTable('room')
+            .onUpdate('CASCADE')
+            .onDelete('CASCADE');
     });
 }
 
