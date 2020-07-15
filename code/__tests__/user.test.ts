@@ -1,14 +1,11 @@
 import connection from '../db_test/connection';
 import supertest from 'supertest'
 import app from '../src/app/server';
-
-import hash  from  '../src/dataService/user';
-import userValidate from '../src/schemaValidation/user';
-import { User } from '../src/controller/userController/userController';
+import crypto from 'crypto-js';
 
 const request = supertest(app);
 
-describe('should test user iteration', () => {
+describe('should test user registration', () => {
     
     beforeAll( async () => {
         // run migration
@@ -37,6 +34,7 @@ describe('should test user iteration', () => {
             password: "12345678"
         }
 
+        //user
         const response = await request
                 .post('/user')
                 .send(invalidUser);
@@ -48,23 +46,6 @@ describe('should test user iteration', () => {
         done()
     });
 
-    it('should verify if user already exists', async done => {
-        const invalidUser = {
-            email: 'wesley@gmail.com',
-            name: 'wesleyGolembiewski',
-            password: '734i84urf7e'
-        }
-
-        const response = await request
-                .post('/user')
-                .send(invalidUser);
-
-        expect(response.status).toBe(412);
-        expect(response.body.message).toEqual("User already exist");
-        
-        done()
-    });
-
     it('should insert a new user with hash', async done => {
         const user = {
             name: "MarioJose",
@@ -72,20 +53,31 @@ describe('should test user iteration', () => {
             password: '123456789'
         }
 
-        const hashUser = await hash.userGenerateHash(user) as User;
+        crypto.SHA256(user.password).toString(crypto.enc.Hex);
+        
 
-        const insertedUser = await connection('user').insert(hashUser);
+        const insertedUser = await connection('user').insert(user);
 
         expect(insertedUser).toBeTruthy();
+
         done();
     });
 
-    it('should get email hash and return an user', async done => {
-        const emailHash = await hash.getEmailHash('wesley@gmail.com');
+    it('should verify if user already exist', async done => {
+        const userNotFound = {
+            email: "marcos@gmail.com",
+            name: "marcosSilva",
+            password: "12345678"
+        }
 
-        const user = await connection('user').select('*').where('email', emailHash);
+        const response = await request
+            .post('/user')
+            .send(userNotFound);
 
-        expect(user.length).toBe(1);
+        console.log(response.body);
+        expect(response.status).toBe(412);
+        expect(response.body.message).toEqual("User already exist");
+
         done();
     });
 });
