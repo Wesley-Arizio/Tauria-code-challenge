@@ -1,9 +1,9 @@
 import { User } from '../controller/userController/userController';
 import crypto from 'crypto-js'
 
-class Encript{
+class Hash{
 
-    async encryptedData(user: User){
+    async userGenerateHash(user: User){
         try {
                 
             const email     = crypto.SHA256(user.email).toString(crypto.enc.Hex);
@@ -21,14 +21,29 @@ class Encript{
                 })
                 .catch((error) => {
                     return {
-                        message: 'error on return promise: ',
+                        message: 'Error returning promise: ',
                         error
                     }
                 });
         } catch(error) {
-            console.error('Error on encrypting data: ', error);
+            return {
+                message: 'Error encrypting data: ',
+                error
+            }
         }
     }
+    
+    async getEmailHash(email: string){
+        try{
+            return crypto.SHA256(email).toString(crypto.enc.Hex);
+        }catch(error){
+            return {
+                message: 'Error ong getting user by email',
+                error
+            }
+        }
+    }
+
 }
 
-export default new Encript;
+export default new Hash;
