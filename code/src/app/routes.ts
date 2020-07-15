@@ -1,9 +1,9 @@
 import express from 'express';
 
-const routes = express.Router();
+import  userController from '../controller/userController/userController';
 
-routes.get('/', (req, res) => {
-    res.status(200).send('Starting the project');
-})
+
+const routes = express.Router();
+routes.post('/user', userController.validateData);
 
 export default routes;
