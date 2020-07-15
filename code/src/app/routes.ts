@@ -4,6 +4,15 @@ import  userController from '../controller/userController/userController';
 
 
 const routes = express.Router();
-routes.post('/user', userController.validateData);
+
+// create an user
+routes.post('/user', userController.createUser);
+
+// route to authenticate an user
+routes.post('/login', (req, res) => {
+
+});
+// routes to get all users
+routes.get('/users', userController.getUsers);
 
 export default routes;
