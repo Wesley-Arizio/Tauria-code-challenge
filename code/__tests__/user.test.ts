@@ -2,10 +2,11 @@ import connection from '../db_test/connection';
 import supertest from 'supertest'
 import app from '../src/app/server';
 import crypto from 'crypto-js';
+import { string, number } from '@hapi/joi';
 
 const request = supertest(app);
 
-describe('should test user registration', () => {
+describe('should test users end-point and db requests', () => {
     
     beforeAll( async () => {
         // run migration
@@ -34,7 +35,6 @@ describe('should test user registration', () => {
             password: "12345678"
         }
 
-        //user
         const response = await request
                 .post('/user')
                 .send(invalidUser);
@@ -74,10 +74,32 @@ describe('should test user registration', () => {
             .post('/user')
             .send(userNotFound);
 
-        console.log(response.body);
         expect(response.status).toBe(412);
         expect(response.body.message).toEqual("User already exist");
 
         done();
     });
+
+    it('Should get users list', async done => {
+        const response = await request.get('/users');
+        
+        expect(response.status).toBe(200);
+        expect(response.body.message).toEqual('You can see all users');
+        done();
+    });
+
+    it('should get user by name', async done => {
+        const username = 'marcos';
+        const response = await request.get('/user').send({name: username});
+
+        expect(response.status).toBe(200);
+        expect(response.body.usersFound[0]).toEqual({
+            id: 28,
+            email: "weslsey@at.com.br",
+            name: 'marcos'
+        });
+
+        done();
+    });
+
 });
