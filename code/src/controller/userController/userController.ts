@@ -118,7 +118,59 @@ class UserController {
            usersFound
         });
     }
-    
+
+    async authenticate(req: Request, res: Response){        
+
+        const validAuth = Joi.object({
+            email: Joi.string()
+                .email()
+                .required(),
+
+            password: Joi.string()
+                .min(8)
+                .max(255)
+                .required()
+        });
+
+        const { value, error } = validAuth.validate(req.body);
+        const user: User = value;
+        
+
+        if(error) {
+            return res.status(412).send({
+                message: "Invalid data",
+                error: error.details[0].message,
+            });
+        }
+
+        const userCount: any =  await knex('user').where('email', user.email);
+
+        if(userCount.length === 0){
+            return res.status(412).send({
+                message: "User not found"
+            });
+        }
+
+        try {
+            const hashPassword = crypto.SHA256(user.password).toString(crypto.enc.Hex);
+
+            if(hashPassword !== userCount[0].password){
+                return res.status(400).send({
+                    message: 'Incorrect password',
+                })
+            }
+
+            return res.status(200).send({
+                message: 'user is authenticated'
+            });
+
+        } catch(error) {
+            return res.status(400).send({
+                message: 'Error authenticating user'
+            });
+
+        }
+    }
 }
 
 export default new UserController;
