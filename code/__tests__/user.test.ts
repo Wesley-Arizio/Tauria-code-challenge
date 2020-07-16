@@ -1,14 +1,32 @@
-import connection from '../db_test/connection';
 import supertest from 'supertest'
 import app from '../src/app/server';
 
+import connection from '../src/database/connection/connection';
+
 import auth from '../src/controller/userController/auth'
-
-
 
 const request = supertest(app);
 
 describe('should test users end-point and db requests', () => {
+    beforeAll( async () => {
+        // run migration
+        await connection.migrate.latest();
+    });
+
+    beforeEach( async () => {
+        // run seed
+        await connection.seed.run();
+    });
+
+    afterEach( async () => {
+        // delete data
+        await connection.table('user').delete();
+    });
+
+    afterAll( async () => {
+        // Delete table
+        await connection.table('user').del();
+    });
 
     it('should return error when receives invalid data', async done => {
         const invalidUser = {
@@ -103,4 +121,39 @@ describe('should test users end-point and db requests', () => {
 
         done();
     });
+    
+    it('should update user account', async done => {
+        const token = await auth(1);
+        const response = await request
+            .put('/user')
+            .set(
+                'Authorization',
+                `Bearer ${token}`
+            )
+            .send({
+                email: "marcos@gmail.com",
+                name: "marcosSilva",
+                password: "987654321" 
+            });
+
+        expect(response.status).toBe(200);
+        expect(response.body.message).toEqual('user was updated');
+
+        done();
+    });
+
+    it('should delete an account', async done => {
+        const token = await auth(1);
+        const response = await request
+            .delete('/user')
+            .set(
+                'Authorization',
+                `Bearer ${token}`
+            )
+        
+        expect(response.status).toBe(200);
+        expect(response.body.message).toEqual('User was deleted');
+    
+        done();
+    })
 });
