@@ -202,6 +202,24 @@ class UserController {
             });
         }
     }
+
+    async deleteUser(req: Request, res: Response){
+        const id = req.userId;
+
+        try {
+            await knex('user').delete().where('id', id);
+
+            req.userId = undefined;
+            
+            return res.status(200).send({
+                message: 'User has been deleted'
+            })
+        } catch (error) {
+            return res.status(400).send({
+                message: 'Error on deleting an user'
+            })
+        }
+    }
 }
 
 export default new UserController;
