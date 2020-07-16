@@ -168,6 +168,40 @@ class UserController {
 
         }
     }
+
+    async updateUser(req: Request, res: Response){
+        const  id = req.userId;
+        
+        const { value, error } = await userValidate(req.body);
+        const user: User = value;
+
+        if(error){
+            return res.status(400).send({
+                message: 'Invalid data, cannot update your information: ',
+                error
+            });
+        }
+        
+        try {
+            const hashPassword =  crypto.SHA256(user.password).toString(crypto.enc.Hex);
+            const userUpdated = await knex('user')
+                .update({
+                    name: user.name,
+                    password: hashPassword
+                }, ['name','email'])
+                .where('id', id);
+ 
+            return res.status(200).send({
+                message: 'user was updated',
+                userUpdated
+            })  
+        } catch (error) {
+            return res.status(400).send({
+                message: 'Error updating user information',
+                error
+            });
+        }
+    }
 }
 
 export default new UserController;
