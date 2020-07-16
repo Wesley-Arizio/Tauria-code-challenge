@@ -9,9 +9,7 @@ const routes = express.Router();
 routes.post('/user', userController.createUser);
 
 // route to authenticate an user
-routes.post('/login', (req, res) => {
-
-});
+routes.post('/authenticate', userController.authenticate);
 
 // routes to get all users
 routes.get('/users', userController.getUsers);
