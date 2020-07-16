@@ -1,9 +1,12 @@
 import express from 'express';
-import routes from './routes';
+import publicRoute from './routes/public';
+import privateRoute from './routes/private'
 
 const app = express();
 
 app.use(express.json());
-app.use(routes);
+
+app.use(publicRoute);
+app.use(privateRoute);
 
 export default app;
