@@ -12,7 +12,11 @@ routes.post('/user', userController.createUser);
 routes.post('/login', (req, res) => {
 
 });
+
 // routes to get all users
 routes.get('/users', userController.getUsers);
+
+// route to get user by name
+routes.get('/username', userController.getUserByName);
 
 export default routes;
