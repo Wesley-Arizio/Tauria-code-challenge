@@ -4,6 +4,7 @@ import crypto from 'crypto-js'
 
 
 import userValidate from '../../schemaValidation/user';
+import Joi from '@hapi/joi';
 
 export interface User {
     email: string,
@@ -39,8 +40,8 @@ class UserController {
             const hashPassword =  crypto.SHA256(user.password).toString(crypto.enc.Hex); 
             await knex('user')
                 .insert({
-                    email: user.email,
-                    name: user.name,
+                    email: user.email.toLowerCase(),
+                    name: user.name.toLowerCase(),
                     password: hashPassword
                 })
                 .then(() => {  
@@ -85,6 +86,43 @@ class UserController {
             }
         }
     }
+
+    async getUserByName(req: Request, res: Response){
+
+        const nameValidate = Joi.object({
+            name: Joi.string()
+                .alphanum()
+                .min(5)
+                .max(20)
+                .required()
+        });
+
+        const { value, error } = nameValidate.validate(req.body);
+
+        if(error) {
+            return res.status(412).send({
+                message: "Invalid data",
+                error: error.details[0].message,
+            });
+        }
+
+        const usersFound = await knex('user').select('name', 'email', 'id').where('name', (value.name).toLowerCase());
+
+        if(usersFound.length === 0){
+            return res.status(412).send({
+                message: "User not fount"
+            });
+        }
+
+        return res.status(200).send({
+           usersFound
+        });
+    }
+    
 }
+
+
+// return  userValidator.validate(data);
+
 
 export default new UserController;
