@@ -3,6 +3,7 @@ import { Request, Response } from 'express';
 import crypto from 'crypto-js'
 
 
+import auth from './auth';
 import userValidate from '../../schemaValidation/user';
 import Joi from '@hapi/joi';
 
@@ -38,23 +39,19 @@ class UserController {
         
         try{
             const hashPassword =  crypto.SHA256(user.password).toString(crypto.enc.Hex); 
-            await knex('user')
+            const insertedUser = await knex('user')
                 .insert({
                     email: user.email.toLowerCase(),
                     name: user.name.toLowerCase(),
                     password: hashPassword
-                })
-                .then(() => {  
-                    return res.status(200).send({
-                        message: 'User has been created: ',
-                    });
-                })
-                .catch(error => {
-                    return res.status(400).send({
-                        message: 'Error creating user',
-                        error 
-                    });
-                });
+                }, 'id');
+
+           const token = await auth(insertedUser[0]);
+
+           return res.status(200).send({
+               messsage: 'User has been created',
+               token
+           });
         }catch(error){
             return {
                 message: "Error validating user",
@@ -120,7 +117,6 @@ class UserController {
     }
 
     async authenticate(req: Request, res: Response){        
-
         const validAuth = Joi.object({
             email: Joi.string()
                 .email()
@@ -159,11 +155,12 @@ class UserController {
                     message: 'Incorrect password',
                 })
             }
+            const token = await auth(userCount[0].id);
 
             return res.status(200).send({
-                message: 'user is authenticated'
+                message: 'user is authenticated',
+                token
             });
-
         } catch(error) {
             return res.status(400).send({
                 message: 'Error authenticating user'
