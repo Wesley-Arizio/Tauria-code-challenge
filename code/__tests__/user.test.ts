@@ -9,27 +9,7 @@ import auth from '../src/controller/userController/auth'
 const request = supertest(app);
 
 describe('should test users end-point and db requests', () => {
-    
-    beforeAll( async () => {
-        // run migration
-        await connection.migrate.latest();
-    });
 
-    beforeEach( async () => {
-        // run seed
-        await connection.seed.run();
-    });
-
-    afterEach( async () => {
-        // delete data
-        await connection.table('user').delete();
-    });
-
-    afterAll( async () => {
-        // Delete table
-        await connection.table('user').del();
-    });
-    
     it('should return error when receives invalid data', async done => {
         const invalidUser = {
             email: "user.name@gmail.com",
@@ -49,7 +29,7 @@ describe('should test users end-point and db requests', () => {
     });
 
     it('should verify if user already exist', async done => {
-        const userNotFound = {
+        const userNotExist = {
             email: "marcos@gmail.com",
             name: "marcosSilva",
             password: "12345678"
@@ -57,7 +37,7 @@ describe('should test users end-point and db requests', () => {
 
         const response = await request
             .post('/user')
-            .send(userNotFound);
+            .send(userNotExist);
 
         expect(response.status).toBe(412);
         expect(response.body.message).toEqual("User already exist");
