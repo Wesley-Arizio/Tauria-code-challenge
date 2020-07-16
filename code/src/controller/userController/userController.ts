@@ -106,7 +106,7 @@ class UserController {
             });
         }
 
-        const usersFound = await knex('user').select('name', 'email', 'id').where('name', (value.name).toLowerCase());
+        const usersFound = await knex('user').select('id', 'name', 'email').where('name', (value.name).toLowerCase());
 
         if(usersFound.length === 0){
             return res.status(412).send({
@@ -120,9 +120,5 @@ class UserController {
     }
     
 }
-
-
-// return  userValidator.validate(data);
-
 
 export default new UserController;
