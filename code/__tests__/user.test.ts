@@ -2,7 +2,7 @@ import supertest from 'supertest'
 import app from '../src/app/server';
 
 import connection from '../src/database/connection/connection';
-
+import { v4 as uuidv4 } from 'uuid';
 import auth from '../src/controller/userController/auth'
 
 const request = supertest(app);
@@ -30,9 +30,9 @@ describe('should test users end-point and db requests', () => {
 
     it('should return error when receives invalid data', async done => {
         const invalidUser = {
-            email: "user.name@gmail.com",
-            name: "jose",
-            password: "12345678"
+            username: "jose",
+            mobile_token: "111111",
+            password: "12"
         }
 
         const response = await request
@@ -47,15 +47,15 @@ describe('should test users end-point and db requests', () => {
     });
 
     it('should verify if user already exist', async done => {
-        const userNotExist = {
-            email: "marcos@gmail.com",
-            name: "marcosSilva",
+        const userExist = {
+            username: "marcosSilva",
+            mobile_token: "111111",
             password: "12345678"
         }
 
         const response = await request
             .post('/user')
-            .send(userNotExist);
+            .send(userExist);
 
         expect(response.status).toBe(412);
         expect(response.body.message).toEqual("User already exist");
@@ -72,13 +72,11 @@ describe('should test users end-point and db requests', () => {
     });
 
     it('should get user by name', async done => {
-        const username = { name: "Marcos" } ;
+        const username = { username: "marcosSilva" } ;
         const response = await request.get('/user').send(username);
-
+        
         expect(response.status).toBe(200);
-        expect(response.body.usersFound[0]).toEqual(
-            {id: 1,  email: "marcos@gmail.com", name: "marcos"},
-        );
+        expect(response.body.user.length).toBe(1);
 
         done();
     });
@@ -87,7 +85,7 @@ describe('should test users end-point and db requests', () => {
         const response = await request
             .post('/authenticate')
             .send({
-                email: "marcos@gmail.com",
+                username: "marcosSilva",
                 password: "123456789" 
             });
 
@@ -96,7 +94,8 @@ describe('should test users end-point and db requests', () => {
     });
 
     it('should be able to accesss private route when authenticated', async done => {
-        const token = await auth(1);
+        const id = uuidv4();
+        const token = await auth(id);
         const response = await request
             .get('/home')
             .set(
@@ -123,7 +122,8 @@ describe('should test users end-point and db requests', () => {
     });
     
     it('should update user account', async done => {
-        const token = await auth(1);
+        const id = uuidv4();
+        const token = await auth(id);
         const response = await request
             .put('/user')
             .set(
@@ -131,8 +131,8 @@ describe('should test users end-point and db requests', () => {
                 `Bearer ${token}`
             )
             .send({
-                email: "marcos@gmail.com",
-                name: "marcosSilva",
+                username: "marcosSilva",
+                mobile_token: "111111",
                 password: "987654321" 
             });
 
@@ -143,7 +143,8 @@ describe('should test users end-point and db requests', () => {
     });
 
     it('should delete an account', async done => {
-        const token = await auth(1);
+        const id = uuidv4()
+        const token = await auth(id);
         const response = await request
             .delete('/user')
             .set(
@@ -151,8 +152,8 @@ describe('should test users end-point and db requests', () => {
                 `Bearer ${token}`
             )
         
-        expect(response.status).toBe(200);
-        expect(response.body.message).toEqual('User was deleted');
+        expect(response.status).toBe(204);
+        // expect(response.body.message).toEqual('User was deleted');
     
         done();
     })

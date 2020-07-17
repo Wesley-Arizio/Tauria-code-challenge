@@ -1,15 +1,15 @@
 import knex from '../../database/connection/connection';
 import { Request, Response } from 'express';
 import crypto from 'crypto-js'
-
+import { v4 as uuidv4 } from 'uuid';
 
 import auth from './auth';
 import userValidate from '../../schemaValidation/user';
 import Joi from '@hapi/joi';
 
 export interface User {
-    email: string,
-    name: string,
+    username: string,
+    mobile_token?: string,
     password: string
 }
 
@@ -27,7 +27,7 @@ class UserController {
             });
         }
 
-        const userCount: any =  await knex('user').where('email', user.email);
+        const userCount: any =  await knex('user').where('username', user.username);
 
         
         if(userCount.length > 0){
@@ -38,32 +38,33 @@ class UserController {
 
         
         try{
-            const hashPassword =  crypto.SHA256(user.password).toString(crypto.enc.Hex); 
+            const hashPassword = crypto.SHA256(user.password).toString(crypto.enc.Hex); 
             const insertedUser = await knex('user')
                 .insert({
-                    email: user.email.toLowerCase(),
-                    name: user.name.toLowerCase(),
+                    id: uuidv4(),
+                    username: user.username,
+                    mobile_token: user.mobile_token,
                     password: hashPassword
                 }, 'id');
 
            const token = await auth(insertedUser[0]);
-
+        console.log(insertedUser)
            return res.status(200).send({
                messsage: 'User has been created',
                token
            });
         }catch(error){
-            return {
+            return res.status(400).send({
                 message: "Error validating user",
                 error
-            }
+            });
         }
-    }  
+    }
     
     async getUsers(req: Request, res: Response){
         try {
             await knex('user')
-                .select('email', 'name')
+                .select('id', 'username', 'mobile_token')
                     .then(users => {
                         return res.status(200).send({
                             message: 'You can see all users',
@@ -77,20 +78,18 @@ class UserController {
                         });
                     });
         } catch(error) {
-            return {
+            return res.status(400).send({
                 message: "Error on getting all users: ",
                 error
-            }
+            });
         }
     }
 
     async getUserByName(req: Request, res: Response){
 
         const nameValidate = Joi.object({
-            name: Joi.string()
+            username: Joi.string()
                 .alphanum()
-                .min(5)
-                .max(20)
                 .required()
         });
 
@@ -103,23 +102,22 @@ class UserController {
             });
         }
 
-        const usersFound = await knex('user').select('id', 'name', 'email').where('name', (value.name).toLowerCase());
+        const usersFound = await knex('user').select('id', 'username', 'mobile_token').where('username', value.username);
 
         if(usersFound.length === 0){
             return res.status(412).send({
-                message: "User not fount"
+                message: "User not found"
             });
         }
 
         return res.status(200).send({
-           usersFound
+            user: usersFound
         });
     }
 
     async authenticate(req: Request, res: Response){        
         const validAuth = Joi.object({
-            email: Joi.string()
-                .email()
+            username: Joi.string()
                 .required(),
 
             password: Joi.string()
@@ -139,11 +137,11 @@ class UserController {
             });
         }
 
-        const userCount: any =  await knex('user').where('email', user.email);
+        const userCount: any =  await knex('user').where('username', user.username);
 
         if(userCount.length === 0){
             return res.status(412).send({
-                message: "User not found"
+                message: "Invalid credentials"
             });
         }
 
@@ -152,7 +150,7 @@ class UserController {
 
             if(hashPassword !== userCount[0].password){
                 return res.status(400).send({
-                    message: 'Incorrect password',
+                    message: "Invalid credentials"
                 })
             }
             const token = await auth(userCount[0].id);
@@ -181,20 +179,22 @@ class UserController {
                 error
             });
         }
+
         
         try {
             const hashPassword =  crypto.SHA256(user.password).toString(crypto.enc.Hex);
             const userUpdated = await knex('user')
                 .update({
-                    name: user.name,
+                    username: user.username,
+                    mobile_token: user.mobile_token,
                     password: hashPassword
-                }, ['name','email'])
+                }, ['username', 'mobile_token', 'password'])
                 .where('id', id);
  
             return res.status(200).send({
                 message: 'user was updated',
                 userUpdated
-            })  
+            })
         } catch (error) {
             return res.status(400).send({
                 message: 'Error updating user information',
@@ -211,9 +211,7 @@ class UserController {
 
             req.userId = undefined;
             
-            return res.status(200).send({
-                message: 'User has been deleted'
-            })
+            return res.status(204).send()
         } catch (error) {
             return res.status(400).send({
                 message: 'Error on deleting an user'
