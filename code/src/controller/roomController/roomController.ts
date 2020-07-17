@@ -67,17 +67,24 @@ class RoomController{
     }
 
     async getAllRooms(req: Request, res: Response){
-        const list = await knex('room')
-            .select("*");
+        try {
+            const list = await knex('room')
+                .select("*");
 
-        return res.status(200).send({
-            list
-        })
+            return res.status(200).send({
+                list
+            })
+        } catch(error) {
+            return res.status(400).send({
+                message: 'Error on getting all rooms: ',
+                error
+            })
+        }
     }
 
-    async enterInRoom(req: Request, res: Response){
+    async enterRoom(req: Request, res: Response){
         const room_id = req.params.room_id; 
-        const user_isd = req.userId;
+        const user_id = req.userId;
 
         const capacity = (await knex('room').select('capacity').where('id', room_id))[0].capacity;
 
@@ -90,7 +97,7 @@ class RoomController{
         }
         
         const isValid = allUsersIn.filter( item => {
-            return item.user_id === user_isd
+            return item.user_id === user_id
         });
 
 
@@ -102,13 +109,13 @@ class RoomController{
 
         try {
             await knex('user_room').insert({
-                user_id: user_isd,
+                user_id: user_id,
                 room_id: room_id
             });
     
             return res.status(200).send({
                 message: "You're in"
-            })
+            });
         } catch (error){
             return res.status(400).send({
                 message: "Error on inserting you into this room"
@@ -116,7 +123,45 @@ class RoomController{
         }
     }
 
+    async leaveRoom(req: Request, res: Response){
+    }
 
+    async getRoomByUserName(req: Request, res: Response){
+        const  { username }   = req.body;
+
+        try {
+            const query = (await knex('user').select('id').where('username', username))[0];
+            
+            if(query.length == 0){
+                return res.status(404).send({
+                    message: 'Invalid credentials'
+                });
+            }
+    
+            const roomsList = await knex('room')
+                    .innerJoin('user_room', 'room.id', '=', 'user_room.room_id')
+                    .where('user_room.user_id', '=', query.id)
+                    .innerJoin('user', 'user.id', '=', 'user_room.user_id')
+                    .select(['room.id', 'room.name', 'room.capacity', 'user_room.user_id', 'user.username']);
+    
+            if(roomsList.length == 0){
+                return res.status(201).send({
+                    message: 'No rooms to show'
+                });
+            }
+
+            return res.status(200).send({
+                message: 'All rooms is here',
+                roomsList
+            });
+
+        } catch (error) {
+            return res.status(400).send({
+                message: 'Error on getting users room: ',
+                error 
+            })
+        }
+    }
 }
 
 export default new RoomController;
