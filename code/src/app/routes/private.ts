@@ -32,6 +32,6 @@ privateRoute.post('/room', roomController.create);
 privateRoute.post('/room/enter/:room_id', roomController.enterRoom);
 
 //leave room
-privateRoute.post('/room/leave/:rooom_id', roomController.leaveRoom);
+privateRoute.post('/room/leave/:room_id', roomController.leaveRoom);
 
 export default privateRoute;
