@@ -13,7 +13,6 @@ declare global {
     }
  }
 
-
 privateRoute.use(authenticate)
 
 privateRoute.get('/home', (req, res) => {
@@ -28,5 +27,8 @@ privateRoute.delete('/user', userController.deleteUser);
 
 // create room
 privateRoute.post('/room', roomController.create);
+
+// enter in room
+privateRoute.post('/room/enter', roomController.enterInRoom);
 
 export default privateRoute;
