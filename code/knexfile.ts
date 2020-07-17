@@ -1,5 +1,4 @@
 // Update with your config settings.
-
 module.exports = {
   development: {
     client: 'pg',
@@ -20,24 +19,27 @@ module.exports = {
     seeds: {
       directory: `${__dirname}/src/database/seed`,
     }
-
-  },
-
-  test: {
-    client: 'sqlite3',
+  }
+}
+export default {
+  development: {
+    client: 'pg',
 
     connection: {
-      filename: `${__dirname}/db_test/db_test.sqlite`
+      database: 'tauria',
+      user: 'postgres',
+      password: 'toor',
     },
 
-    useNullAsDefault: true,
+    searchPath: ['knex', 'private'],
 
     migrations: {
-      directory: `${__dirname}/db_test/migration`,
+      schemaName: 'private',
+      directory: `${__dirname}/src/database/migration`,
     },
 
     seeds: {
-      directory: `${__dirname}/db_test/seed`,
+      directory: `${__dirname}/src/database/seed`,
     }
   }
 };
