@@ -22,7 +22,7 @@ privateRoute.get('/home', (req, res) => {
 // update user
 privateRoute.put('/user', userController.updateUser);
 
-//delete user
+// delete user
 privateRoute.delete('/user', userController.deleteUser);
 
 // create room
@@ -31,7 +31,10 @@ privateRoute.post('/room', roomController.create);
 // enter room
 privateRoute.post('/room/enter/:room_id', roomController.enterRoom);
 
-//leave room
+// leave room
 privateRoute.post('/room/leave/:room_id', roomController.leaveRoom);
+
+// delete room
+privateRoute.delete('/room/:room_id', roomController.deleteRoom);
 
 export default privateRoute;
