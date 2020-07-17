@@ -1,6 +1,7 @@
 import express from 'express';
 
 import  userController from '../../controller/userController/userController';
+import roomController from '../../controller/roomController/roomController';
 
 
 const publicRoute = express.Router();
@@ -16,5 +17,7 @@ publicRoute.get('/users', userController.getUsers);
 
 // route to get user by name
 publicRoute.get('/user', userController.getUserByName);
+
+publicRoute.get('/rooms', roomController.getAllRooms);
 
 export default publicRoute;
