@@ -11,13 +11,7 @@ const roomValidator = Joi.object({
         .max(50)
         .optional(),
 
-    participants: Joi.array()
-        .items(Joi.number().required())
-        .unique()
-        .default([])
-        .max(Joi.ref("capacity")),
-
-    host: Joi.number()
+    host: Joi.any()
         .required()
         
 });
