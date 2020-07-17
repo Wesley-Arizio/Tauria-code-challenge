@@ -128,16 +128,15 @@ class RoomController{
         const { room_id } = req.params;
 
         try {
+            const query = await knex('room')
+                .innerJoin('user_rooom', 'room.id','=', 'user_room.room_id')
+                .delete()
+                .where('room.host_id', '=', user_id)
+                .andWhere('room.id', '=', room_id)
             
-            const host = await knex('room')
-                    .select('host_id')
-                    .where('id', room_id)
-                    .first();
-
-            if(host.host_id === user_id){
-                await knex('room').del().where('id', room_id);
-                return res.send({
-                    msg: 'This room has been deleted'
+            if(query !== 0){
+                return res.status(200).send({
+                    message: 'The room has been deleted'
                 });
             }
 
@@ -201,6 +200,34 @@ class RoomController{
                 message: 'Error on getting users room: ',
                 error 
             })
+        }
+    }
+
+    async deleteRoom(req: Request, res: Response){
+        const user_id = req.userId;
+        const { room_id } = req.params;
+
+        try {
+            const query = await knex('room')
+                            .innerJoin('user_rooom', 'room.id','=', 'user_room.room_id')
+                            .delete()
+                            .where('room.host_id', '=', user_id)
+                            .andWhere('room.id', '=', room_id);
+
+            if(query == 0){
+                return res.status(400).send({
+                    message: 'Cannot delete this room'
+                });
+            }
+            
+            return res.status(200).send({
+                message: 'The room has been deleted'
+            })
+        } catch (error) {
+            return res.status(400).send({
+                message: 'Cannot delete this room, try again',
+                error
+            });
         }
     }
 
