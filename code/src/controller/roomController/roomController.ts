@@ -1,20 +1,22 @@
 import roomValidate from '../../schemaValidation/room';
 import { Request, Response } from 'express';
 import knex from '../../database/connection/connection';
+import { v4 as uuidv4 } from 'uuid';
+
 
 interface Room {
+    id?: string
     name: string,
     capacity: number,
-    participants: [number],
-    host: number
+    host: string
 }
 
 class RoomController{
+    
     async create(req: Request, res: Response){
         const {
             name,
             capacity,
-            participants,
         } = req.body;
 
         const host = req.userId;
@@ -22,7 +24,6 @@ class RoomController{
         const { value, error } = await roomValidate({
             name,
             capacity,
-            participants,
             host
         });
 
@@ -36,28 +37,38 @@ class RoomController{
         }
 
         try {
-            console.log(room);
-            const insertedRoom = await knex('room')
-                .insert({
-                    name: room.name,
-                    capacity: room.capacity,
-                    participants: room.participants,
-                    host: host
-                });
-            
-            
+            room.id =  uuidv4();
 
-            return res.send({
-                ok: true
+            await knex('room')
+                    .insert({
+                        id: room.id,
+                        name: room.name,
+                        capacity: room.capacity,
+                        host_id: room.host 
+                    });
+                                
+            await knex('user_room')
+                    .insert({
+                        user_id: room.host,
+                        room_id: room.id
+                    });
+
+        
+            return res.status(200).send({
+                message: 'Room conference has been created'
             });
 
+            // return res.status(200).send({
+            //     message: 'Room conference has been created'
+            // });
         } catch (error) {
             return res.status(400).send({
                 message: 'Error on creating a new room confernece',
                 error
             })
         }
-    }   
+    }
+
 }
 
 export default new RoomController;
