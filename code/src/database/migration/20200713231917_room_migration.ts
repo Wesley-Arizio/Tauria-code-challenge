@@ -3,7 +3,7 @@ import * as Knex from "knex";
 
 export async function up(knex: Knex): Promise<void> {
     return knex.schema.createTable('room', table => {
-        table.increments('id')
+        table.uuid('id')
             .primary()
             .notNullable();
 
@@ -13,9 +13,7 @@ export async function up(knex: Knex): Promise<void> {
         table.integer('capacity')
             .notNullable();
 
-        table.specificType('participants', 'INT[]');
-
-        table.integer('host')
+        table.uuid('host_id')
             .notNullable()
             .references('id')
             .inTable('user')

@@ -1,5 +1,6 @@
 import * as Knex from "knex";
 import crypto from 'crypto-js'
+import { v4 as uuidv4 } from 'uuid';
 
 export async function seed(knex: Knex): Promise<void> {
     // Deletes ALL existing entries
@@ -11,19 +12,8 @@ export async function seed(knex: Knex): Promise<void> {
 
     // Inserts seed entries
     await knex("user").insert([
-        { id:1, email: "marcos@gmail.com", name: "marcos", password:  password },
-        { id:2, email: "andre@gmail.com",  name: "andre",  password:  password },
-        { id:3, email: "joana@gmail.com",  name: "joana",  password:  password }
-    ]);
-
-    await knex("room").insert([
-        { id:1, name: "br_office", capacity: 30, participants: [2, 3], host: 1 },
-        { id:2, name: "main", capacity: 50, participants: [1, 3], host: 2 }
-    ]);
-
-    await knex("user_room").insert([
-        { id:1, user: 2, room: 1 },
-        { id:2, user: 3, room: 2 },
-        { id:3, user: 1, room: 2 }
+        { id: uuidv4(), username: "marcosSilva", mobile_token: "111111",  password:  password },
+        { id: uuidv4(), username: "andreOliveira",  mobile_token: "222222",  password:  password },
+        { id: uuidv4(), username: "mateusFernandes",  mobile_token: "333333",  password:  password }
     ]);
 };

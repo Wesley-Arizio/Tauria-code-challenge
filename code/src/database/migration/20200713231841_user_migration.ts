@@ -3,16 +3,16 @@ import * as Knex from "knex";
 
 export async function up(knex: Knex): Promise<void> {
     return knex.schema.createTable('user', table => {
-        table.increments('id')
+        table.uuid('id')
             .primary()
             .notNullable();
 
-        table.string('email')
+        table.string('username')
             .notNullable()
             .unique();
 
-        table.string('name')
-            .notNullable();
+        table.string('mobile_token')
+            .nullable();
 
         table.string('password')
             .notNullable();
