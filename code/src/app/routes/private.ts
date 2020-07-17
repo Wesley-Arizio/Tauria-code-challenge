@@ -28,7 +28,10 @@ privateRoute.delete('/user', userController.deleteUser);
 // create room
 privateRoute.post('/room', roomController.create);
 
-// enter in room
-privateRoute.post('/room/enter', roomController.enterInRoom);
+// enter room
+privateRoute.post('/room/enter/:room_id', roomController.enterRoom);
+
+//leave room
+privateRoute.post('/room/leave/:rooom_id', roomController.leaveRoom);
 
 export default privateRoute;
