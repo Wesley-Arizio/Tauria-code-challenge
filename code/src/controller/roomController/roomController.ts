@@ -124,6 +124,47 @@ class RoomController{
     }
 
     async leaveRoom(req: Request, res: Response){
+        const user_id = req.userId;
+        const { room_id } = req.params;
+
+        try {
+            
+            const host = await knex('room')
+                    .select('host_id')
+                    .where('id', room_id)
+                    .first();
+
+            if(host.host_id === user_id){
+                await knex('room').del().where('id', room_id);
+                return res.send({
+                    msg: 'This room has been deleted'
+                });
+            }
+
+            await knex('user_room')
+                        .select('*')
+                        .where('room_id', room_id)
+                        .where('user_id', user_id)
+                        .first()
+                        .delete()
+                .then(() => {
+                    return res.status(200).send({
+                        message: "You left this room"
+                    });
+                })
+                .catch((error) => {
+                    return res.status(400).send({
+                        message: 'You still here',
+                        error
+                    });
+                });
+        } catch(error) {
+            return res.status(400).send({
+                message: 'Error leaving this room',
+                error
+            });
+        }
+        
     }
 
     async getRoomByUserName(req: Request, res: Response){
@@ -162,6 +203,7 @@ class RoomController{
             })
         }
     }
+
 }
 
 export default new RoomController;
