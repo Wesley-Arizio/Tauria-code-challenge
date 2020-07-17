@@ -18,6 +18,10 @@ publicRoute.get('/users', userController.getUsers);
 // route to get user by name
 publicRoute.get('/user', userController.getUserByName);
 
+// get all rooms
 publicRoute.get('/rooms', roomController.getAllRooms);
+
+// get rooms by username
+publicRoute.get('/rooms-list', roomController.getRoomByUserName);
 
 export default publicRoute;
