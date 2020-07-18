@@ -199,7 +199,7 @@ class RoomController{
             return res.status(400).send({
                 message: 'Error on getting users room: ',
                 error 
-            })
+            });
         }
     }
 
@@ -231,6 +231,48 @@ class RoomController{
         }
     }
 
+    async changeHost(req: Request, res: Response){
+        const user_id = req.userId;
+        const { room_id } = req.params;
+        const { username } = req.body
+
+        
+        try {
+            const newHostId = await knex('user').select('id').where('username', username).first();
+    
+            const findInRoom = await knex('user_room')
+                        .select('user_id')
+                        .where("user_id", newHostId.id)
+                        .where('room_id', room_id);
+
+            if(findInRoom.length == 0){
+                return res.status(400).send({
+                    message: "Cannot add foreign user as host, user must be here"
+                });
+            }
+
+            const updateHost = await knex('room')
+                    .where('host_id', '=', user_id)
+                    .where('id', '=' ,room_id)
+                    .update('host_id', newHostId.id, '*');
+
+            if(updateHost.length > 0){
+                return res.status(200).send({
+                    message: "Host changed"
+                });
+            }
+            
+            return res.status(400).send({
+                messager: 'Invalid credentiasl, cannot change host'
+            });
+        } catch (error) {
+            return res.status(400).send({
+                message: 'Cannot change host',
+                error
+            });
+        }
+    }
+    
 }
 
 export default new RoomController;
