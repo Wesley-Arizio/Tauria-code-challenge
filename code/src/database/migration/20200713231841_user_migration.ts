@@ -5,7 +5,7 @@ export async function up(knex: Knex): Promise<void> {
     return knex.schema.createTable('user', table => {
         table.uuid('id')
             .primary()
-            .notNullable();
+            .notNullable()
 
         table.string('username')
             .notNullable()

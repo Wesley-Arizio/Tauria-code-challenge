@@ -9,7 +9,6 @@ export async function seed(knex: Knex): Promise<void> {
     await knex("user_room").del();
  
     const password = crypto.SHA256('123456789').toString(crypto.enc.Hex);
-
     // Inserts seed entries
     await knex("user").insert([
         { id: uuidv4(), username: "marcosSilva", mobile_token: "111111",  password:  password },

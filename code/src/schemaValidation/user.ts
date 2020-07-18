@@ -3,21 +3,19 @@ import Joi from '@hapi/joi'
 const userValidate = async (data: Object) => {
     const userValidator = Joi.object({
         
-        email: Joi.string()
-                .email()
+        username: Joi.string()
+                .alphanum()
                 .required(),
 
-        name: Joi.string()
-            .alphanum()
-            .min(5)
-            .max(20)
-            .required(),
+        mobile_token: Joi.string()
+            .alphanum(),
 
         password: Joi.string()
             .min(8)
             .max(255)
             .required()
     });
+    
     return  userValidator.validate(data);
 }
 

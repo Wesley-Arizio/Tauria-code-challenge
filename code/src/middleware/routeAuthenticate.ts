@@ -36,7 +36,7 @@ export default function authenticate(req: Request, res: Response, next: NextFunc
             return res.status(401).send({
                 error: 'Invalid token'
             });
-        }   
+        }
         
         req.userId = decoded.id
         next();

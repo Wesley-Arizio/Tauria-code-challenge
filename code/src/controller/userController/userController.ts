@@ -48,7 +48,7 @@ class UserController {
                 }, 'id');
 
            const token = await auth(insertedUser[0]);
-        console.log(insertedUser)
+           
            return res.status(200).send({
                messsage: 'User has been created',
                token
