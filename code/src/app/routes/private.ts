@@ -37,4 +37,6 @@ privateRoute.post('/room/leave/:room_id', roomController.leaveRoom);
 // delete room
 privateRoute.delete('/room/:room_id', roomController.deleteRoom);
 
+privateRoute.patch('/room/:room_id', roomController.changeHost);
+
 export default privateRoute;
