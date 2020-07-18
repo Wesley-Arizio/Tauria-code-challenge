@@ -22,6 +22,6 @@ publicRoute.get('/user', userController.getUserByName);
 publicRoute.get('/rooms', roomController.getAllRooms);
 
 // get rooms by username
-publicRoute.get('/rooms-list', roomController.getRoomByUserName);
+publicRoute.get('/user/rooms', roomController.getRoomByUserName);
 
 export default publicRoute;
