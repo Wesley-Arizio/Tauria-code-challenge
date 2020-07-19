@@ -182,7 +182,7 @@ class RoomController{
                     .innerJoin('user_room', 'room.id', '=', 'user_room.room_id')
                     .where('user_room.user_id', '=', query.id)
                     .innerJoin('user', 'user.id', '=', 'user_room.user_id')
-                    .select(['room.id', 'room.name', 'room.capacity', 'user_room.user_id', 'user.username']);
+                    .select(['room.id', 'room.name', 'room.capacity']);
     
             if(roomsList.length == 0){
                 return res.status(201).send({
@@ -253,7 +253,7 @@ class RoomController{
 
             const updateHost = await knex('room')
                     .where('host_id', '=', user_id)
-                    .where('id', '=' ,room_id)
+                    .where('id', '=', room_id)
                     .update('host_id', newHostId.id, '*');
 
             if(updateHost.length > 0){
@@ -273,6 +273,26 @@ class RoomController{
         }
     }
     
+    async getParticipants(req: Request, res: Response){
+        const { room_id } = req.params;
+
+        try {
+            const participants = await knex('user')
+                    .innerJoin('user_room', 'user_room.user_id', '=', 'user.id')
+                    .innerJoin('room', 'user_room.room_id', '=', 'room.id' )
+                    .where('room.id', '=', room_id)
+                    .select('user.id','user.username', 'user.mobile_token');
+            
+            return res.status(200).send({
+                message: 'all users in this room',
+                participants
+            });
+        } catch (error) {
+            return res.status(400).send({
+                message: "Cannot get participants"
+            });
+        }
+    }
 }
 
 export default new RoomController;

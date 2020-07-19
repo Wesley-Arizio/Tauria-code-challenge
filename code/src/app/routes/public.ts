@@ -21,7 +21,10 @@ publicRoute.get('/user', userController.getUserByName);
 // get all rooms
 publicRoute.get('/rooms', roomController.getAllRooms);
 
-// get rooms by username
+// shows all rooms in which the user is
 publicRoute.get('/user/rooms', roomController.getRoomByUserName);
+
+// get participants in room
+publicRoute.get('/room/participants/:room_id', roomController.getParticipants);
 
 export default publicRoute;
